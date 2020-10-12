@@ -35,3 +35,8 @@ locals {
   tcp_protocol = "tcp"
   all_ips      = ["0.0.0.0/0"]
 }
+
+variable "custom_tags" {
+  type        = map(string)
+  default     = {}
+}
