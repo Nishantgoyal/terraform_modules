@@ -8,13 +8,13 @@ variable "cluster_name" {
   type = string
 }
 
-variable "db_remote_state_bucket" {
-  type = string
-}
+# variable "db_remote_state_bucket" {
+#   type = string
+# }
 
-variable "db_remote_state_key" {
-  type = string
-}
+# variable "db_remote_state_key" {
+#   type = string
+# }
 
 variable "instance_type" {
   type = string

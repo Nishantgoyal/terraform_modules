@@ -126,22 +126,22 @@ resource "aws_lb_target_group" "asg" {
   }
 }
 
-data "terraform_remote_state" "db" {
-  backend = "s3"
+# data "terraform_remote_state" "db" {
+#   backend = "s3"
 
-  config = {
-    bucket = var.db_remote_state_bucket
-    key    = var.db_remote_state_key
-    region = "us-east-2"
-  }
-}
+#   config = {
+#     bucket = var.db_remote_state_bucket
+#     key    = var.db_remote_state_key
+#     region = "us-east-2"
+#   }
+# }
 
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 
   vars = {
     server_port = var.server_port
-    db_address  = data.terraform_remote_state.db.outputs.address
-    db_port     = data.terraform_remote_state.db.outputs.port
+    db_address  = "data.terraform_remote_state.db.outputs.address"
+    db_port     = "data.terraform_remote_state.db.outputs.port"
   }
 }
