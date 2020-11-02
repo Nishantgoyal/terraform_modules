@@ -183,7 +183,7 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_credit_balance" {
   metric_name = "CPUCreditBalance"
 
   dimensions = {
-    AutoScalingGroupName - aws_autoscaling_group.example.name
+    AutoScalingGroupName = aws_autoscaling_group.example.name
   }
 
   comparison_operator = "LessThanThreshold"
