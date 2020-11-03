@@ -11,7 +11,7 @@ resource "aws_launch_configuration" "example" {
   instance_type   = var.instance_type
   security_groups = [aws_security_group.instance.id]
 
-  user_data = data.template_file.user_data.rendered
+  user_data = length(data.template_file.user_data[*]) > 0 ? data.template_file.user_data[0].rendered : data.template_file.user_data_new[0].rendered
 
   lifecycle {
     create_before_destroy = true
@@ -37,8 +37,8 @@ resource "aws_autoscaling_group" "example" {
     for_each = var.custom_tags
 
     content {
-      key = tag.key
-      value = tag.value
+      key                 = tag.key
+      value               = tag.value
       propagate_at_launch = true
     }
   }
@@ -147,6 +147,7 @@ resource "aws_lb_target_group" "asg" {
 # }
 
 data "template_file" "user_data" {
+  count    = var.enable_new_user_data ? 0 : 1
   template = file("${path.module}/user-data.sh")
 
   vars = {
@@ -156,8 +157,15 @@ data "template_file" "user_data" {
   }
 }
 
+data "template_file" "user_data_new" {
+  count    = var.enable_new_user_data ? 1 : 0
+  template = file("${path.module}/user-data-new.sh")
+  vars = {
+    server_port = var.server_port
+  }
+}
 resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
-  count = var.enable_autoscaling ? 1 : 0
+  count                  = var.enable_autoscaling ? 1 : 0
   scheduled_action_name  = "scale_out_during_business_hours"
   min_size               = 5
   max_size               = 10
@@ -167,7 +175,7 @@ resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
 }
 
 resource "aws_autoscaling_schedule" "scale_in_at_night" {
-  count = var.enable_autoscaling ? 1 : 0
+  count                  = var.enable_autoscaling ? 1 : 0
   scheduled_action_name  = "scale_in_at_night"
   min_size               = 5
   max_size               = 10
@@ -177,9 +185,9 @@ resource "aws_autoscaling_schedule" "scale_in_at_night" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "low_cpu_credit_balance" {
-  count = format("%.1s", var.instance_type) == "t" ? 1 : 0
-  alarm_name = "${var.cluster_name}-low-cpu-credit-balance"
-  namespace = "AWS/EC2"
+  count       = format("%.1s", var.instance_type) == "t" ? 1 : 0
+  alarm_name  = "${var.cluster_name}-low-cpu-credit-balance"
+  namespace   = "AWS/EC2"
   metric_name = "CPUCreditBalance"
 
   dimensions = {
@@ -187,9 +195,9 @@ resource "aws_cloudwatch_metric_alarm" "low_cpu_credit_balance" {
   }
 
   comparison_operator = "LessThanThreshold"
-  evaluation_periods = 1
-  period = 300
-  statistic = "Minimum"
-  threshold = 10
-  unit = "Count"
+  evaluation_periods  = 1
+  period              = 300
+  statistic           = "Minimum"
+  threshold           = 10
+  unit                = "Count"
 }

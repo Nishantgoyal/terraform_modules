@@ -37,10 +37,16 @@ locals {
 }
 
 variable "custom_tags" {
-  type        = map(string)
-  default     = {}
+  type    = map(string)
+  default = {}
 }
 
 variable "enable_autoscaling" {
   type = bool
 }
+
+variable "enable_new_user_data" {
+  type        = bool
+  description = "(optional) describe your variable"
+}
+ 
