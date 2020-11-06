@@ -44,9 +44,13 @@ variable "custom_tags" {
 variable "enable_autoscaling" {
   type = bool
 }
-
-variable "enable_new_user_data" {
-  type        = bool
-  description = "(optional) describe your variable"
-}
  
+variable "ami" {
+  default = "ami-0c55b159cbfafe1f0"
+  type = string
+}
+
+variable "server_text" {
+  default = "Hello, World!"
+  type = string
+}
